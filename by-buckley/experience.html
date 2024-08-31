@@ -1,3 +1,5 @@
+<!-- This page was built using the assistance of Claude AI -->
+
 <!DOCTYPE html>
 <html lang="en" class="dark">
 <head>
@@ -375,6 +377,40 @@
             transform: scale(1.1);
             opacity: 1; /* Full opacity on hover */
         }
+
+        .video-container {
+            position: relative;
+        }
+
+        .loading-indicator {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 24px;
+            color: hsl(var(--foreground));
+            background-color: hsl(var(--background) / 0.8);
+            padding: 10px 20px;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .loading-indicator::after {
+            content: '...';
+            animation: loading 1.5s infinite;
+            width: 20px;
+            text-align: left;
+            display: inline-block;
+        }
+
+        @keyframes loading {
+            0% { content: '.'; }
+            33% { content: '..'; }
+            66% { content: '...'; }
+        }
+        
     </style>
 </head>
 <body>
@@ -420,6 +456,7 @@
                 <div class="content">
                     <div class="content-wrapper">
                         <div class="video-container digital-video">
+                            <div class="loading-indicator">Loading</div>
                             <video class="video-frame" autoplay loop muted>
                                 <source src="./videos/digital-technologies.mp4" type="video/mp4">
                                 Your browser does not support the video tag.
@@ -478,6 +515,7 @@
                             </div>                    
                         </div>
                         <div class="video-container design-video">
+                            <div class="loading-indicator">Loading</div>
                             <video class="video-frame" autoplay loop muted>
                                 <source src="./videos/design-technologies.mp4" type="video/mp4">
                                 Your browser does not support the video tag.
@@ -841,6 +879,24 @@
                 scrollToSection(sectionId);
             });
         });
+
+        function handleVideoLoading() {
+            const videos = document.querySelectorAll('.video-frame');
+            videos.forEach(video => {
+                const loadingIndicator = video.parentElement.querySelector('.loading-indicator');
+                
+                video.addEventListener('loadeddata', () => {
+                    loadingIndicator.style.display = 'none';
+                });
+
+                video.addEventListener('error', () => {
+                    loadingIndicator.textContent = 'Error loading video';
+                });
+            });
+        }
+
+        // Call the function when the DOM is loaded
+        document.addEventListener('DOMContentLoaded', handleVideoLoading);
 
     </script>
 </body>
