@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Casey Buckley - Technologies Teacher Resume</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/DrawSVGPlugin.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="apple-touch-icon" sizes="180x180" href="./favicon/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="./favicon/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="./favicon/favicon-16x16.png">
+<link rel="manifest" href="./favicon/site.webmanifest">
+<link rel="mask-icon" href="./favicon/safari-pinned-tab.svg" color="#5bbad5">
+<meta name="msapplication-TileColor" content="#da532c">
+<meta name="theme-color" content="#ffffff">
+    <link rel="stylesheet" href="CSS/alter.css">
+
+    <style>
+        :root {
+            --background: 240 10% 3.9%;
+            --foreground: 0 0% 98%;
+            --card: 240 10% 3.9%;
+            --card-foreground: 0 0% 98%;
+            --popover: 240 10% 3.9%;
+            --popover-foreground: 0 0% 98%;
+            --primary: 0 0% 98%;
+            --primary-foreground: 240 5.9% 10%;
+            --secondary: 240 3.7% 15.9%;
+            --secondary-foreground: 0 0% 98%;
+            --muted: 240 3.7% 15.9%;
+            --muted-foreground: 240 5% 64.9%;
+            --accent: 240 3.7% 15.9%;
+            --accent-foreground: 0 0% 98%;
+            --destructive: 0 62.8% 30.6%;
+            --destructive-foreground: 0 0% 98%;
+            --border: 240 3.7% 15.9%;
+            --input: 240 3.7% 15.9%;
+            --ring: 240 4.9% 83.9%;
+        }
+        body {
+            background-color: hsl(var(--background));
+            color: hsl(var(--foreground));
+        }
+        .bubble {
+            position: absolute;
+            border-radius: 50%;
+            pointer-events: none;
+            opacity: 0;
+        }
+        #question-mark {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+            cursor: pointer;
+        }
+        #tooltip {
+            background-color: hsl(var(--popover));
+            color: hsl(var(--popover-foreground));
+            border: 1px solid hsl(var(--border));
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center p-8 overflow-hidden">
+    <div id="gradient-background"></div>
+    <div id="bubbles-container"></div>
+
+    <div id="loading" class="fixed inset-0 flex items-center justify-center bg-black z-50">
+        <div class="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-white"></div>
+    </div>
+
+    <div id="thank-you-header" class="fixed inset-0 flex flex-col items-center justify-center bg-gray-900 text-white opacity-0 z-40">
+        <h1 class="text-8xl font-bold mb-4">Thanks for dropping by!</h1>
+        <p class="text-xl">Please note this experience is designed to run on larger screens.</p>
+    </div>
+
+    <div id="main-content" class="container mx-auto relative z-10 opacity-0">
+        <div id="model-container"></div>
+        <div class="overlay absolute inset-0"></div>
+        <div id="text-container" class="relative text-white text-center">
+            <h1 id="typewriter" class="text-4xl md:text-6xl font-bold mb-4 min-h-[3em]"></h1>
+            <button id="start-button" class="mt-4 px-6 py-3 bg-gray-700 text-white rounded-full font-semibold pulse-button hidden">Let's get started</button>
+        </div>
+    </div>
+
+    <div id="question-mark">
+        <i data-lucide="help-circle" class="w-8 h-8"></i>
+    </div>
+
+    <div id="move-on-button-container" class="fixed bottom-8 left-1/2 transform -translate-x-1/2 z-50">
+        <a id="move-on-button" href="about.html" class="px-6 py-3 bg-gray-700 text-white rounded-full font-semibold opacity-0 inline-block no-underline">
+            Click here to move on
+        </a>
+    </div>
+
+    <div id="tooltip" class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 p-6 rounded-lg shadow-lg opacity-0 pointer-events-none z-50 max-w-md w-full">
+        <h3 id="tooltip-title" class="text-xl font-bold mb-2"></h3>
+        <p id="tooltip-text" class="text-sm"></p>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            let scene, camera, renderer, model, controls, raycaster, mouse, light;
+            let greenLight, greenLightHelper;
+
+            function initThreeJS() {
+                scene = new THREE.Scene();
+                camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+                
+                renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+                renderer.setSize(window.innerWidth, window.innerHeight);
+                document.getElementById('model-container').appendChild(renderer.domElement);
+
+                controls = new THREE.OrbitControls(camera, renderer.domElement);
+                controls.enableZoom = false;
+                controls.enablePan = false;
+
+                raycaster = new THREE.Raycaster();
+                mouse = new THREE.Vector2();
+
+                const loader = new THREE.GLTFLoader();
+                loader.load(
+                    './models/scene.gltf',
+                    function (gltf) {
+                        model = gltf.scene;
+                        scene.add(model);
+                        model.position.set(0, -1, 0);
+                        camera.position.z = 15;
+
+                        const box = new THREE.Box3().setFromObject(model);
+                        const scaleFactory = Math.max(
+                            window.innerWidth / (box.max.x - box.min.x),
+                            window.innerHeight / (box.max.y - box.min.y)
+                        );
+                        model.scale.multiplyScalar(scaleFactory * 0.015);
+
+                        animate();
+                        startAnimationSequence();
+                    },
+                    undefined,
+                    function (error) {
+                        console.error("An error occurred loading the model:", error);
+                    }
+                );
+
+                const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
+                scene.add(ambientLight);
+
+                const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+                directionalLight.position.set(5, 5, 5);
+                scene.add(directionalLight);
+
+                greenLight = new THREE.PointLight(0x00ff00, 1, 10);
+                greenLight.position.set(0, 0, 0);
+                scene.add(greenLight);
+
+                greenLightHelper = new THREE.PointLightHelper(greenLight, 0.1);
+                scene.add(greenLightHelper);
+
+                window.addEventListener('resize', onWindowResize, false);
+                renderer.domElement.addEventListener('mousemove', onMouseMove, false);
+            }
+
+            function animate() {
+                requestAnimationFrame(animate);
+
+                if (model) {
+                    model.rotation.y += 0.005;
+                }
+
+                checkIntersections();
+
+                renderer.render(scene, camera);
+            }
+
+            function checkIntersections() {
+                raycaster.setFromCamera(mouse, camera);
+                const intersects = raycaster.intersectObject(model, true);
+
+                if (intersects.length > 0) {
+                    const intersectionPoint = intersects[0].point;
+                    greenLight.position.copy(intersectionPoint);
+                    greenLightHelper.update();
+                }
+            }
+
+            function onMouseMove(event) {
+                const rect = renderer.domElement.getBoundingClientRect();
+                mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+                mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+            }
+
+            function onWindowResize() {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            }
+
+            function startAnimationSequence() {
+                const loading = document.getElementById('loading');
+                const thankYouHeader = document.getElementById('thank-you-header');
+                const mainContent = document.getElementById('main-content');
+                const startButton = document.getElementById('start-button');
+
+                anime({
+                    targets: loading,
+                    opacity: 0,
+                    duration: 1000,
+                    easing: 'easeInOutQuad',
+                    complete: function() {
+                        loading.style.display = 'none';
+
+                        anime({
+                            targets: thankYouHeader,
+                            opacity: 1,
+                            duration: 1000,
+                            easing: 'easeInOutQuad',
+                            complete: function() {
+                                setTimeout(function() {
+                                    anime({
+                                        targets: thankYouHeader,
+                                        opacity: 0,
+                                        duration: 1000,
+                                        easing: 'easeInOutQuad',
+                                        complete: function() {
+                                            thankYouHeader.style.display = 'none';
+                                            mainContent.style.opacity = 1;
+                                            
+                                            const typewriter = document.getElementById('typewriter');
+                                            const text = "Hi! My name is Casey Buckley.\n\nThis is my interactive resumé.";
+                                            let i = 0;
+                                            const typingSpeed = 50;
+
+                                            function typeWriter() {
+                                                if (i < text.length) {
+                                                    if (text.charAt(i) === '\n') {
+                                                        typewriter.innerHTML += '<br>';
+                                                    } else {
+                                                        typewriter.innerHTML += text.charAt(i);
+                                                    }
+                                                    i++;
+                                                    setTimeout(typeWriter, typingSpeed);
+                                                } else {
+                                                    typewriter.classList.add('typing-indicator');
+                                                    startButton.classList.remove('hidden');
+                                                }
+                                            }
+
+                                            typeWriter();
+                                        }
+                                    });
+                                }, 2000);
+                            }
+                        });
+                    }
+                });
+            }
+
+            function showTooltip(title, content) {
+                const tooltip = document.getElementById('tooltip');
+                const tooltipTitle = document.getElementById('tooltip-title');
+                const tooltipText = document.getElementById('tooltip-text');
+
+                tooltipTitle.textContent = title;
+                tooltipText.innerHTML = content;
+                gsap.to(tooltip, {
+                    opacity: 1,
+                    duration: 0.3,
+                    ease: "power2.out"
+                });
+            }
+
+            function hideTooltip() {
+                const tooltip = document.getElementById('tooltip');
+                gsap.to(tooltip, {
+                    opacity: 0,
+                    duration: 0.2,
+                    ease: "power2.in"
+                });
+            }
+
+            const questionMark = document.getElementById('question-mark');
+            questionMark.addEventListener('mouseenter', () => showTooltip("About this page", `
+                <p class="mb-4">This interactive resumé showcases my skills and passion for creating fun and engaging resources!</p>
+                <p class="mb-4">This micro:bit 3D model is fully interactive; try clicking and dragging it!</p>
+                <p class="mb-4">When you're done, click the button at the bottom to move on.</p>
+                <p class="mb-4">This page contains some video files. It is recommended that you access this with a decent internet connection.</p>
+                <p class="mb-4">Please contact me if you have any accessibility issues viewing the content. A more traditional PDF CV is also available on request.</p>
+                <p class="mb-8 mt-4 text-lg">- Casey</p>
+                <p class="mb-4 text-xs">This model is not my original work and was made by the user jezd, retrieved from https://skfb.ly/LIXn</p>
+
+            `));
+            questionMark.addEventListener('mouseleave', hideTooltip);
+
+            function reverseTypewriter() {
+                const typewriter = document.getElementById('typewriter');
+                const text = typewriter.innerHTML;
+                let i = text.length;
+
+                function eraseText() {
+                    if (i > 0) {
+                        typewriter.innerHTML = text.slice(0, i - 1);
+                        i--;
+                        setTimeout(eraseText, 25);
+                    } else {
+                        const textContainer = document.getElementById('text-container');
+                        
+                        gsap.to(textContainer, {
+                            backgroundColor: 'rgba(0, 0, 0, 0)',
+                            duration: 1,
+                            ease: "power2.out",
+                            onComplete: () => {
+                                textContainer.style.display = 'none';
+                                showMoveOnButton();
+                            }
+                        });
+                    }
+                }
+
+                eraseText();
+            }
+
+            function showMoveOnButton() {
+                const moveOnButton = document.getElementById('move-on-button');
+
+                gsap.to(moveOnButton, {
+                    opacity: 1,
+                    duration: 1,
+                    ease: "power2.out",
+                    onComplete: () => {
+                        moveOnButton.style.pointerEvents = 'auto';
+                    }
+                });
+            }
+
+            document.getElementById('start-button').addEventListener('click', function() {
+                reverseTypewriter();
+                this.classList.add('hidden');
+            });
+
+            initThreeJS();
+            createPurpleGradient();
+            createBubbles();
+            lucide.createIcons();
+        });
+
+        function createBubbles() {
+            const bubblesContainer = document.getElementById('bubbles-container');
+            const bubbleColors = ['rgba(255, 179, 186, 0.3)', 'rgba(186, 255, 201, 0.3)', 'rgba(186, 225, 255, 0.3)', 'rgba(255, 255, 186, 0.3)'];
+            
+            for (let i = 0; i < 30; i++) {
+                const bubble = document.createElement('div');
+                bubble.classList.add('bubble');
+                bubble.style.backgroundColor = bubbleColors[Math.floor(Math.random() * bubbleColors.length)];
+                bubble.style.left = `${Math.random() * 100}vw`;
+                bubble.style.top = `${Math.random() * 100}vh`;
+                bubblesContainer.appendChild(bubble);
+
+                animateBubble(bubble);
+            }
+        }
+
+        function animateBubble(bubble) {
+            const duration = 5000 + Math.random() * 7000;
+            const scale = 0.5 + Math.random() * 1;
+
+            anime({
+                targets: bubble,
+                translateX: `${-100 + Math.random() * 200}px`,
+                translateY: `${-100 + Math.random() * 200}px`,
+                scale: [0, scale],
+                opacity: [0, 0.4, 0],
+                easing: 'easeInOutQuad',
+                duration: duration,
+                complete: () => {
+                    bubble.style.left = `${Math.random() * 100}vw`;
+                    bubble.style.top = `${Math.random() * 100}vh`;
+                    animateBubble(bubble);
+                }
+            });
+        }
+
+        function createPurpleGradient() {
+            const gradient = document.getElementById('gradient-background');
+            gradient.style.position = 'fixed';
+            gradient.style.top = '0';
+            gradient.style.left = '0';
+            gradient.style.width = '100vw';
+            gradient.style.height = '100vh';
+            gradient.style.background = 'linear-gradient(45deg, #2D3748, #1A202C)';
+            gradient.style.opacity = '0.8';
+            gradient.style.zIndex = '-1';
+        }
+    </script>
+</body>
+</html>

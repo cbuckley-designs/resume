@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resources</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/ScrollTrigger.min.js"></script>
+    <script src="https://unpkg.com/@popperjs/core@2"></script>
+    <script src="https://unpkg.com/tippy.js@6"></script>
+    <link rel="stylesheet" href="https://unpkg.com/tippy.js@6/themes/light.css" />
+    <link rel="apple-touch-icon" sizes="180x180" href="./favicon/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="./favicon/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="./favicon/favicon-16x16.png">
+<link rel="manifest" href="./favicon/site.webmanifest">
+<link rel="mask-icon" href="./favicon/safari-pinned-tab.svg" color="#5bbad5">
+<meta name="msapplication-TileColor" content="#da532c">
+<meta name="theme-color" content="#ffffff">
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        :root {
+            --primary: 222.2 47.4% 11.2%;
+            --primary-foreground: 210 40% 98%;
+            --secondary: 217.2 32.6% 17.5%;
+            --secondary-foreground: 210 40% 98%;
+            --background: 222.2 84% 4.9%;
+            --foreground: 210 40% 98%;
+            --muted: 217.2 32.6% 17.5%;
+            --muted-foreground: 215 20.2% 65.1%;
+            --accent: 217.2 32.6% 17.5%;
+            --accent-foreground: 210 40% 98%;
+            --light-blue: 200 75% 60%;
+        }
+
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+
+        html {
+            scroll-snap-type: y mandatory;
+            scroll-behavior: smooth;
+        }
+
+        section {
+            scroll-snap-align: start;
+            scroll-snap-stop: always;
+        }
+
+        .animate-in {
+            opacity: 0;
+            transform: translateY(50px);
+        }
+
+        .hero-content {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 0.7; }
+            50% { transform: scale(1.05); opacity: 1; }
+            100% { transform: scale(1); opacity: 0.7; }
+        }
+
+        .hover-indicator {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: rgba(255, 255, 255, 0.8);
+            color: #000;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 14px;
+            animation: pulse 2s infinite;
+            z-index: 10;
+        }
+
+        .tippy-box {
+            transform-origin: top;
+            transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+        }
+
+        .tippy-box[data-placement^='top'] {
+            transform: translateY(20px) scale(0.9);
+        }
+
+        .tippy-box[data-placement^='bottom'] {
+            transform: translateY(-20px) scale(0.9);
+        }
+
+        .tippy-box[data-state='visible'] {
+            transform: translateY(0) scale(1);
+        }
+
+        .nav-link {
+            position: relative;
+            color: hsl(var(--foreground));
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 2px;
+            bottom: -5px;
+            left: 0;
+            background-color: hsl(var(--primary-foreground));
+            transform: scaleX(0);
+            transform-origin: bottom right;
+            transition: transform 0.3s ease;
+        }
+
+        .nav-link:hover::after {
+            transform: scaleX(1);
+            transform-origin: bottom left;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: hsl(var(--background));
+            min-width: 160px;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            z-index: 1;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .dropdown-content a {
+            color: hsl(var(--foreground));
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            transition: background-color 0.3s ease;
+        }
+
+        .dropdown-content a:hover {
+            background-color: hsl(var(--secondary));
+        }
+
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+        /* Mobile menu styles */
+        .mobile-menu {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .desktop-menu {
+                display: none;
+            }
+
+            .mobile-menu {
+                display: block;
+            }
+        }
+
+        /* Subtle color differences for sections */
+        section:nth-child(odd) {
+            background-color: rgba(0, 41, 92, 0.05);
+        }
+
+        section:nth-child(even) {
+            background-color: rgba(163, 189, 219, 0.05);
+        }
+
+        body {
+            padding-bottom: 100px; /* Adjust this value based on your footer height */
+        }
+
+        /* Modify the footer styles */
+        .footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 50;
+            background-color: rgba(0, 41, 92, 0.9); /* Navy Blue with opacity */
+            backdrop-filter: blur(10px);
+            transform: translateY(100%);
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .footer.visible {
+            transform: translateY(0);
+        }
+
+        /* Adjust the last section to account for the footer */
+        #bottom-hero {
+            padding-bottom: 120px; /* Adjust this value based on your footer height */
+        }
+
+        /* Mobile menu styles */
+        .mobile-menu {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .desktop-menu {
+                display: none;
+            }
+
+            .mobile-menu {
+                display: block;
+            }
+        }
+
+        /* Subtle color differences for sections */
+        section:nth-child(odd) {
+            background-color: rgba(0, 41, 92, 0.05);
+        }
+
+        section:nth-child(even) {
+            background-color: rgba(163, 189, 219, 0.05);
+        }
+
+        #back-to-top {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: hsl(var(--light-blue));
+            color: hsl(var(--background));
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            font-size: 24px;
+            cursor: pointer;
+            display: flex; /* Change this to always display the button */
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            transition: background-color 0.3s, transform 0.3s, opacity 0.3s; /* Add opacity transition */
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            opacity: 0.7; /* Start with a slightly transparent button */
+        }
+
+        #back-to-top:hover {
+            background-color: hsl(var(--light-blue) / 0.8);
+            transform: scale(1.1);
+            opacity: 1; /* Full opacity on hover */
+        }
+
+        
+    </style>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "hsl(var(--primary))",
+                        secondary: "hsl(var(--secondary))",
+                        background: "hsl(var(--background))",
+                        foreground: "hsl(var(--foreground))",
+                        muted: "hsl(var(--muted))",
+                        accent: "hsl(var(--accent))",
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-background text-foreground">
+    <nav class="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <a href="about.html" class="text-2xl font-bold">Casey Buckley</a>
+            <div class="desktop-menu hidden md:block">
+                <ul class="flex space-x-4">
+                    <li><a href="about.html" class="hover:text-primary-foreground transition-colors">About</a></li>
+                    <li class="dropdown">
+                        <a href="#" class="hover:text-primary-foreground transition-colors">My Work</a>
+                        <div class="dropdown-content">
+                            <a href="experience.html">Experience</a>
+                            <a href="qualifications.html">Qualifications</a>
+                            <a href="resources.html">Resources</a>
+                            <a href="index.html">View the 3D Model Again</a>
+                            
+                        </div>
+                    </li>
+                    <li><a href="contact.html" class="hover:text-primary-foreground transition-colors">Contact</a></li>
+                </ul>
+            </div>
+            <div class="mobile-menu md:hidden">
+                <select onchange="if (this.value) window.location.href=this.value" class="bg-background text-foreground border border-foreground rounded p-1">
+                    <option value="">Menu</option>
+                    <option value="about.html">About</option>
+                    <option value="experience.html">Experience</option>
+                    <option value="qualifications.html">Qualifications</option>
+                    <option value="resources.html">Resources</option>
+                    <option value="contact.html">Contact</option>
+                    <option value="index.html">View the 3D Model Again</option>
+
+                </select>
+            </div>
+        </div>
+    </nav>
+
+    <main class="pt-16">
+        <section id="hero" class="h-screen flex items-center justify-center relative overflow-hidden">
+            <div class="container mx-auto px-4 text-center hero-content">
+                <h1 class="text-5xl md:text-7xl font-bold mb-12">Digital Resources Showcase</h1>
+                <p class="text-xl md:text-2xl mb-16">I specialise in creating and selecting interactive, engaging, and highly accessible resources for the classroom.</p>
+                <a href="#resource1" class="bg-primary text-primary-foreground px-6 py-3 rounded-full text-lg font-semibold hover:bg-primary/90 transition-colors">Take a tour</a>
+            </div>
+            <div class="absolute inset-0 pointer-events-none">
+                <div class="absolute top-1/4 left-1/4 w-64 h-64 bg-primary/20 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>
+                <div class="absolute top-1/3 right-1/4 w-64 h-64 bg-secondary/20 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>
+                <div class="absolute bottom-1/4 left-1/2 w-64 h-64 bg-accent/20 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-4000"></div>
+            </div>
+        </section>
+
+        <section id="resource1" class="min-h-screen flex items-center justify-center py-20">
+            <div class="container mx-auto px-4">
+                <div class="flex flex-col md:flex-row items-center gap-12">
+                    <div class="w-full md:w-1/2 relative">
+                        <video class="w-full h-auto rounded-lg shadow-lg animate-in" autoplay loop muted playsinline data-tippy-content="This is a resource I built to support a year 4 humanities unit covering the voyage of the First Fleet. Students track the voyage across the globe, engage with facts and images, and interact with various 3D models. This content is specifically catering to what is taught and reinforced within the classroom.">
+                            <source src="./videos/bespoke-resources.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    </div>
+                    <div class="w-full md:w-1/2">
+                        <h2 class="text-4xl font-bold mb-6 animate-in">Bespoke Resources</h2>
+                        <p class="text-lg mb-6 animate-in">I endeavour to make high quality resources to enhance student learning.</p>
+                        <p class="text-lg mb-6 animate-in">If I can't find a perfect existing resource or solution out there, I design my own.</p>
+                        <a href="https://bit.ly/first-fleet-voyage" class="learn-more inline-block bg-primary text-primary-foreground px-6 py-3 rounded-full text-lg font-semibold hover:bg-primary/90 transition-colors animate-in">Check out this resource yourself</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="resource2" class="min-h-screen flex items-center justify-center py-20">
+            <div class="container mx-auto px-4">
+                <div class="flex flex-col md:flex-row-reverse items-center gap-12">
+                    <div class="w-full md:w-1/2 relative">
+                        <video class="w-full h-auto rounded-lg shadow-lg animate-in" autoplay loop muted playsinline data-tippy-content="This is 'Say G'day to Godot', a game development course I built from the ground up for a game development extracurricular. It uses a reward system and interactive simulations to engage students and explain programming and game design principles in meaningful ways.">
+                            <source src="./videos/gamified-resources.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    </div>
+                    <div class="w-full md:w-1/2">
+                        <h2 class="text-4xl font-bold mb-6 animate-in">Gamified Learning</h2>
+                        <p class="text-lg mb-6 animate-in">I endeavour to make learning fun.</p>
+                        <p class="text-lg mb-6 animate-in">My learning experiences target student engagement with gamification and interactivity.</p>
+                        <a href="https://cbuckley514.github.io/say-gday-to-godot-2.0/" class="learn-more inline-block bg-primary text-primary-foreground px-6 py-3 rounded-full text-lg font-semibold hover:bg-primary/90 transition-colors animate-in">Check out this resource yourself</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="resource3" class="min-h-screen flex items-center justify-center py-20">
+            <div class="container mx-auto px-4">
+                <div class="flex flex-col md:flex-row items-center gap-12">
+                    <div class="w-full md:w-1/2 relative">
+                        <video class="w-full h-auto rounded-lg shadow-lg animate-in" autoplay loop muted playsinline data-tippy-content="This is a series of resources I developed for a rocket design unit. These leverage inquiry-based learning processes, and chunk content up into accessible, bite-sized portions using highly edited videos.">
+                            <source src="./videos/inquiry-resources.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    </div>
+                    <div class="w-full md:w-1/2">
+                        <h2 class="text-4xl font-bold mb-6 animate-in">Inquiry and Exploration</h2>
+                        <p class="text-lg mb-6 animate-in">I endeavour to make curiosity contagious.</p>
+                        <p class="text-lg mb-6 animate-in">My learning experiences are built to encourage inquiry processes whilst keeping differentiation and accessibility principles at their core.</p>
+                        <a href="https://cbuckley514.github.io/9-rocket-design/" class="learn-more inline-block bg-primary text-primary-foreground px-6 py-3 rounded-full text-lg font-semibold hover:bg-primary/90 transition-colors animate-in">Check out this resource yourself</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="resource4" class="min-h-screen flex items-center justify-center py-20">
+            <div class="container mx-auto px-4">
+                <div class="flex flex-col md:flex-row-reverse items-center gap-12">
+                    <div class="w-full md:w-1/2 relative">
+                        <video class="w-full h-auto rounded-lg shadow-lg animate-in" autoplay loop muted playsinline data-tippy-content="My goal is to innovate existing learning experiences to bring learning into the twenty-first century, and make it fun, engaging, and meaningful. I've worked with a range of tools, and I'm constantly researching new ones to use and employ in the classroom.">
+                            <source src="./videos/educational-software.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    </div>
+                    <div class="w-full md:w-1/2">
+                        <h2 class="text-4xl font-bold mb-6 animate-in">Existing Resources</h2>
+                        <p class="text-lg mb-6 animate-in">I don't always try to reinvent the wheel.</p>
+                        <p class="text-lg mb-6 animate-in">I have experience with a broad range of existing educational software and tools.</p>
+                        <p class="text-lg mb-6 animate-in">From 3D modelling, to augmented and virtual reality - innovating learning experiences is my passion.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="bottom-hero" class="min-h-screen flex items-center justify-center py-20 relative overflow-hidden">
+            <div class="container mx-auto px-4 text-center hero-content">
+                <h2 class="text-5xl md:text-7xl font-bold mb-12 animate-in">And so much more...</h2>
+                <p class="text-xl md:text-2xl mb-16 animate-in">Feel free to contact me and ask me about the projects and tools I've worked with.</p>
+                <a href="contact.html" class="bg-primary text-primary-foreground px-6 py-3 rounded-full text-lg font-semibold hover:bg-primary/90 transition-colors animate-in">Get in touch</a>
+            </div>
+            <div class="absolute inset-0 pointer-events-none">
+                <div class="absolute top-1/4 right-1/4 w-64 h-64 bg-primary/20 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>
+                <div class="absolute bottom-1/3 left-1/4 w-64 h-64 bg-secondary/20 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>
+                <div class="absolute top-1/2 right-1/2 w-64 h-64 bg-accent/20 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-4000"></div>
+            </div>
+        </section>
+
+        <footer class="footer text-foreground py-6">
+            <div class="container mx-auto px-4 text-center">
+                <p class="mb-2">This website, and these resources, were developed with the aid of Claude AI.</p>
+                <p>Everything you see here has been showcased throughout professional development sessions I've ran on the use of AI in the classroom.</p>
+            </div>
+        </footer>
+
+    </main>
+
+    <button id="back-to-top" aria-label="Back to top">↑</button>
+
+    <script>
+        gsap.registerPlugin(ScrollTrigger);
+
+        const animateIn = (element) => {
+            gsap.to(element, {
+                y: 0,
+                opacity: 1,
+                duration: 1,
+                ease: "power3.out",
+            });
+        };
+
+        gsap.utils.toArray(".animate-in").forEach((element) => {
+            ScrollTrigger.create({
+                trigger: element,
+                start: "top 80%",
+                onEnter: () => animateIn(element),
+            });
+        });
+
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // Parallax effect for background blobs
+        gsap.to(".animate-blob", {
+            y: "random(-100, 100)",
+            x: "random(-100, 100)",
+            duration: 10,
+            ease: "none",
+            repeat: -1,
+            repeatRefresh: true,
+        });
+
+        // Cursor trail effect
+        const trail = document.createElement('div');
+        trail.className = 'fixed w-6 h-6 rounded-full pointer-events-none mix-blend-difference';
+        document.body.appendChild(trail);
+
+        let mouseX = 0, mouseY = 0;
+        let trailX = 0, trailY = 0;
+
+        document.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+        });
+
+        gsap.ticker.add(() => {
+            const speed = 0.2;
+            
+            trailX += (mouseX - trailX) * speed;
+            trailY += (mouseY - trailY) * speed;
+            
+            gsap.set(trail, { x: trailX, y: trailY });
+        });
+
+        // Random color change for cursor trail
+        setInterval(() => {
+            const randomColor = `hsl(${Math.random() * 360}, 100%, 50%)`;
+            gsap.to(trail, { backgroundColor: randomColor, duration: 1 });
+        }, 2000);
+
+        // Ensure videos start playing when they come into view
+        const videoObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.play();
+                } else {
+                    entry.target.pause();
+                }
+            });
+        }, { threshold: 0.5 });
+
+        document.querySelectorAll('video').forEach(video => {
+            videoObserver.observe(video);
+        });
+
+        // Add a subtle parallax effect to the sections
+        gsap.utils.toArray("section").forEach((section, i) => {
+            const bg = section.querySelector(".container");
+            gsap.to(bg, {
+                y: "30%",
+                ease: "none",
+                scrollTrigger: {
+                    trigger: section,
+                    scrub: true
+                }
+            });
+        });
+
+        // Animate the hero section elements
+        gsap.from("#hero h1", { opacity: 0, y: 50, duration: 1, delay: 0.5 });
+        gsap.from("#hero p", { opacity: 0, y: 50, duration: 1, delay: 0.7 });
+        gsap.from("#hero a", { opacity: 0, y: 50, duration: 1, delay: 0.9 });
+
+        // Add hover effect to buttons and links
+        const interactiveElements = document.querySelectorAll('button, a');
+        interactiveElements.forEach(element => {
+            element.addEventListener('mouseenter', () => {
+                gsap.to(element, { scale: 1.05, duration: 0.3 });
+            });
+            element.addEventListener('mouseleave', () => {
+                gsap.to(element, { scale: 1, duration: 0.3 });
+            });
+        });
+
+        // Initialize Tippy.js tooltips with CSS spring animation
+        tippy('video', {
+            theme: 'light',
+            placement: 'top',
+            arrow: true,
+            duration: [600, 500],  // Increased duration for slower animation
+            delay: [200, 0],
+            maxWidth: 300,
+        });
+
+        // Add hover indicators to videos
+        document.querySelectorAll('video').forEach(video => {
+            const indicator = document.createElement('div');
+            indicator.className = 'hover-indicator';
+            indicator.textContent = 'Hover for info';
+            video.parentElement.appendChild(indicator);
+
+            video.addEventListener('mouseenter', () => {
+                gsap.to(indicator, { opacity: 0, duration: 0.3, onComplete: () => indicator.remove() });
+            });
+        });
+
+        // Add this new code at the end of your script
+        const footer = document.querySelector('.footer');
+        const bottomSection = document.querySelector('#bottom-hero');
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    footer.classList.add('visible');
+                } else {
+                    footer.classList.remove('visible');
+                }
+            });
+        }, {
+            threshold: 0.1 // Adjust this value to control when the footer appears
+        });
+
+        observer.observe(bottomSection);
+
+        const backToTopButton = document.getElementById('back-to-top');
+
+// Show/hide button based on scroll position
+window.addEventListener('scroll', () => {
+    if (window.scrollY > 100) {
+        backToTopButton.style.opacity = '0.7'; // Show button
+    } else {
+        backToTopButton.style.opacity = '0'; // Hide button
+    }
+});
+
+// Scroll to top when button is clicked
+backToTopButton.addEventListener('click', (e) => {
+    e.preventDefault();
+    window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+    });
+});
+
+// Function to handle smooth scrolling
+function scrollToSection(sectionId) {
+    const section = document.getElementById(sectionId);
+    if (section) {
+        section.scrollIntoView({ behavior: 'smooth' });
+    }
+}
+
+// Handle anchor links
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const sectionId = this.getAttribute('href').substring(1);
+        scrollToSection(sectionId);
+    });
+});
+
+// Ensure the first section is visible on page load
+window.addEventListener('load', () => {
+    scrollToSection('hero');
+});
+
+    </script>
+</body>
+</html>

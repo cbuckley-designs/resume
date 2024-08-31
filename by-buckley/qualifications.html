@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Qualifications</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/ScrollTrigger.min.js"></script>
+    <script src="https://unpkg.com/@popperjs/core@2"></script>
+    <script src="https://unpkg.com/tippy.js@6"></script>
+    <link rel="stylesheet" href="https://unpkg.com/tippy.js@6/themes/light.css" />
+    <link rel="apple-touch-icon" sizes="180x180" href="./favicon/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="./favicon/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="./favicon/favicon-16x16.png">
+<link rel="manifest" href="./favicon/site.webmanifest">
+<link rel="mask-icon" href="./favicon/safari-pinned-tab.svg" color="#5bbad5">
+<meta name="msapplication-TileColor" content="#da532c">
+<meta name="theme-color" content="#ffffff">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        :root {
+            --primary: 222.2 47.4% 11.2%;
+            --primary-foreground: 210 40% 98%;
+            --secondary: 217.2 32.6% 17.5%;
+            --secondary-foreground: 210 40% 98%;
+            --background: 222.2 84% 4.9%;
+            --foreground: 210 40% 98%;
+            --muted: 217.2 32.6% 17.5%;
+            --muted-foreground: 215 20.2% 65.1%;
+            --accent: 217.2 32.6% 17.5%;
+            --accent-foreground: 210 40% 98%;
+            --light-blue: 200 75% 60%;
+        }
+
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+
+        html {
+            scroll-snap-type: y mandatory;
+            scroll-behavior: smooth;
+        }
+
+        section {
+            scroll-snap-align: start;
+            scroll-snap-stop: always;
+        }
+
+        .animate-in {
+            opacity: 0;
+            transform: translateY(50px);
+        }
+
+        .hero-content {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 0.7; }
+            50% { transform: scale(1.05); opacity: 1; }
+            100% { transform: scale(1); opacity: 0.7; }
+        }
+
+        .nav-link {
+            position: relative;
+            color: hsl(var(--foreground));
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 2px;
+            bottom: -5px;
+            left: 0;
+            background-color: hsl(var(--primary-foreground));
+            transform: scaleX(0);
+            transform-origin: bottom right;
+            transition: transform 0.3s ease;
+        }
+
+        .nav-link:hover::after {
+            transform: scaleX(1);
+            transform-origin: bottom left;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: hsl(var(--background));
+            min-width: 160px;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            z-index: 1;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .dropdown-content a {
+            color: hsl(var(--foreground));
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            transition: background-color 0.3s ease;
+        }
+
+        .dropdown-content a:hover {
+            background-color: hsl(var(--secondary));
+        }
+
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+        /* Mobile menu styles */
+        .mobile-menu {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .desktop-menu {
+                display: none;
+            }
+
+            .mobile-menu {
+                display: block;
+            }
+        }
+
+        /* Subtle color differences for sections */
+        section:nth-child(odd) {
+            background-color: rgba(0, 41, 92, 0.05);
+        }
+
+        section:nth-child(even) {
+            background-color: rgba(163, 189, 219, 0.05);
+        }
+
+        body {
+            padding-bottom: 100px;
+        }
+
+        .icon-frame {
+            width: 80px;
+            height: 80px;
+            border: 2px solid hsl(var(--foreground));
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .icon-frame:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+        }
+
+        .icon-frame svg {
+            width: 48px;
+            height: 48px;
+            color: hsl(var(--foreground));
+        }
+
+        .footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 50;
+            background-color: rgba(0, 41, 92, 0.9);
+            backdrop-filter: blur(10px);
+            transform: translateY(100%);
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .footer.visible {
+            transform: translateY(0);
+        }
+
+        #bottom-section {
+            padding-bottom: 120px;
+        }
+
+        #back-to-top {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: hsl(var(--light-blue));
+            color: hsl(var(--background));
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            font-size: 24px;
+            cursor: pointer;
+            display: flex; /* Change this to always display the button */
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            transition: background-color 0.3s, transform 0.3s, opacity 0.3s; /* Add opacity transition */
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            opacity: 0.7; /* Start with a slightly transparent button */
+        }
+
+        #back-to-top:hover {
+            background-color: hsl(var(--light-blue) / 0.8);
+            transform: scale(1.1);
+            opacity: 1; /* Full opacity on hover */
+        }
+
+    </style>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "hsl(var(--primary))",
+                        secondary: "hsl(var(--secondary))",
+                        background: "hsl(var(--background))",
+                        foreground: "hsl(var(--foreground))",
+                        muted: "hsl(var(--muted))",
+                        accent: "hsl(var(--accent))",
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-background text-foreground">
+    <nav class="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <a href="about.html" class="text-2xl font-bold">Casey Buckley</a>
+            <div class="desktop-menu hidden md:block">
+                <ul class="flex space-x-4">
+                    <li><a href="about.html" class="hover:text-primary-foreground transition-colors">About</a></li>
+                    <li class="dropdown">
+                        <a href="#" class="hover:text-primary-foreground transition-colors">My Work</a>
+                        <div class="dropdown-content">
+                            <a href="experience.html">Experience</a>
+                            <a href="qualifications.html">Qualifications</a>
+                            <a href="resources.html">Resources</a>
+                            <a href="index.html">View the 3D Model Again</a>
+                        </div>
+                    </li>
+                    <li><a href="contact.html" class="hover:text-primary-foreground transition-colors">Contact</a></li>
+                </ul>
+            </div>
+            <div class="mobile-menu md:hidden">
+                <select onchange="if (this.value) window.location.href=this.value" class="bg-background text-foreground border border-foreground rounded p-1">
+                    <option value="">Menu</option>
+                    <option value="about.html">About</option>
+                    <option value="experience.html">Experience</option>
+                    <option value="qualifications.html">Qualifications</option>
+                    <option value="resources.html">Resources</option>
+                    <option value="contact.html">Contact</option>
+                    <option value="index.html">View the 3D Model Again</option>
+
+                </select>
+            </div>
+        </div>
+    </nav>
+
+    <main class="pt-16">
+        <section id="hero" class="h-screen flex items-center justify-center relative overflow-hidden">
+            <div class="container mx-auto px-4 text-center hero-content">
+                <h1 class="text-5xl md:text-7xl font-bold mb-12">Qualifications</h1>
+                <p class="text-xl md:text-2xl mb-16">My educational background, accreditations, technical skills, and accomplishments.</p>
+                <a href="#education" class="bg-primary text-primary-foreground px-6 py-3 rounded-full text-lg font-semibold hover:bg-primary/90 transition-colors">Learn More</a>
+            </div>
+            <div class="absolute inset-0 pointer-events-none">
+                <div class="absolute top-1/4 left-1/4 w-64 h-64 bg-primary/20 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>
+                <div class="absolute top-1/3 right-1/4 w-64 h-64 bg-secondary/20 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>
+                <div class="absolute bottom-1/4 left-1/2 w-64 h-64 bg-accent/20 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-4000"></div>
+            </div>
+        </section>
+
+        <section id="education" class="min-h-screen flex items-center justify-center py-20">
+            <div class="container mx-auto px-4">
+                <div class="flex flex-col md:flex-row items-center gap-12">
+                    <div class="w-full md:w-1/2 relative">
+                        <div id="education-icons-container" class="mt-4 flex justify-center gap-8">
+                            <div class="icon-frame education-icon-frame" data-number="1">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
+                                    <path d="M6 12v5c3 3 9 3 12 0v-5"/>
+                                </svg>
+                            </div>
+                            <div class="icon-frame education-icon-frame" data-number="2">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
+                                    <path d="M6 12v5c3 3 9 3 12 0v-5"/>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="w-full md:w-1/2">
+                        <h2 class="text-4xl font-bold mb-6 animate-in">Education</h2>
+                        <p class="text-lg mb-6 animate-in">Bachelor of Education (Secondary) - Queensland University of Technology (QUT)</p>
+                        <p class="text-lg mb-6 animate-in">Bachelor of Information Technology (Computer Science) - Queensland University of Technology (QUT)</p>
+                        <p class="text-sm mb-6 animate-in">Graduated: 2023</p>
+                        <p class="text-sm mb-6 animate-in">GPA: 6.6</p>
+
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <section id="technical-skills" class="min-h-screen flex items-center justify-center py-20">
+            <div class="container mx-auto px-4">
+                <div class="flex flex-col md:flex-row items-center gap-12">
+                    <div class="w-full md:w-1/2 relative">
+                        <div id="os-icons-container" class="mt-8 flex justify-center gap-8">
+                            <div class="icon-frame os-icon-frame" id="windows-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 88 88" width="48" height="48">
+                                    <path d="M0 12.402l35.687-4.86.016 34.423-35.67.203zm35.67 33.529l.028 34.453L.028 75.48.026 45.7zm4.326-39.025L87.314 0v41.527l-47.318.376zm47.329 39.349l-.011 41.34-47.318-6.678-.066-34.739z" fill="#00adef"/>
+                                </svg>
+                            </div>
+                            <div class="icon-frame os-icon-frame" id="macos-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" width="48" height="48">
+                                    <path d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 49.9-11.4 69.5-34.3z" fill="#999999"/>
+                                </svg>
+                            </div>
+                            <div class="icon-frame os-icon-frame" id="ipados-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" width="48" height="48">
+                                    <path d="M400 0H48C21.5 0 0 21.5 0 48v416c0 26.5 21.5 48 48 48h352c26.5 0 48-21.5 48-48V48c0-26.5-21.5-48-48-48zM224 480c-17.7 0-32-14.3-32-32s14.3-32 32-32 32 14.3 32 32-14.3 32-32 32zm176-108c0 6.6-5.4 12-12 12H60c-6.6 0-12-5.4-12-12V60c0-6.6 5.4-12 12-12h328c6.6 0 12 5.4 12 12v312z" fill="#999999"/>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="w-full md:w-1/2">
+                        <h2 class="text-4xl font-bold mb-6 animate-in">Technical Skills</h2>
+                        <ul class="list-disc list-inside text-lg mb-6 animate-in">
+                            <li>Experience with diverse BYOD schools - Windows, macOS, and iPadOS environments</li>
+                            <li>Programming proficiency</li>
+                            <li>Schoolbox LMS</li>
+                            <li>Microsoft Office Suite</li>
+                            <li>CAD 3D Modelling Software</li>
+                            <li>Adobe Suite</li>
+                            <li>Virtual Reality Headsets and Augmented Reality Technology</li>
+                            <li>Various innovative educational software tools (see <a href="resources.html" class="underline">Resources</a> for more)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="accomplishments" class="min-h-screen flex items-center justify-center py-20">
+            <div class="container mx-auto px-4">
+                <div class="flex flex-col md:flex-row-reverse items-center gap-12">
+                    <div class="w-full md:w-1/2 relative">
+                        <div id="accomplishments-icons-container" class="mt-4 flex justify-center gap-8">
+                            <div class="icon-frame accomplishments-icon-frame">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+                                    <path d="M12 8v4m0 0v4m0-4h4m-4 0H8"></path>
+                                </svg>
+                            </div>
+                            <div class="icon-frame accomplishments-icon-frame">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="w-full md:w-1/2">
+                        <h2 class="text-4xl font-bold mb-6 animate-in">Accomplishments</h2>
+                        <ul class="list-disc list-inside text-lg mb-6 animate-in">
+                            <li>Developed a game development-themed year 7 Technologies unit from the ground-up.</li>
+                            <li>Developed and delivered two extracurricular courses.</li>
+                            <li>Coached and attended various RoboCup, FTC, and FLL Robotics tournaments.</li>
+                            <li>Developed and delivered numerous staff professional development sessions on AI.</li>
+                            <li>Developed and delivered numerous bespoke experiences and solutions to integrating Virtual Reality headsets in learning experiences.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="bottom-section" class="min-h-screen flex items-center justify-center py-20">
+            <div class="container mx-auto px-4">
+                <div class="flex flex-col md:flex-row items-center gap-12">
+                    <div class="w-full md:w-1/2 relative">
+                        <div id="experience-icons-container" class="mt-4 flex justify-center gap-8">
+                            <div class="icon-frame experience-icon-frame">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M12 2a10 10 0 1 0 10 10H12V2zM21.18 8.02c-1-2.3-2.85-4.17-5.16-5.18"/>
+                                </svg>
+                            </div>
+                            <div class="icon-frame experience-icon-frame">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="2" y="6" width="20" height="12" rx="2"/>
+                                    <path d="M6 12h4"/>
+                                    <path d="M14 12h4"/>
+                                </svg>
+                            </div>
+                            <div class="icon-frame experience-icon-frame">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="16 18 22 12 16 6"/>
+                                    <polyline points="8 6 2 12 8 18"/>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="w-full md:w-1/2">
+                        <h2 class="text-4xl font-bold mb-6 animate-in">Extracurricular Activities</h2>
+                        <ul class="list-disc list-inside text-lg mb-6 animate-in">
+                            <li>Robotics Coaching - First Lego League, First Tech Challenge, RoboCup</li>
+                            <li>Developed and delivered two game development-themed extracurricular programs</li>
+                            <li>Developed and delivered completely bespoke three-day school holiday program</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <footer class="footer text-foreground py-6">
+            <div class="container mx-auto px-4 text-center">
+                <div class="w-full md:w-1/2 mx-auto">
+                    <p class="text-lg mb-6 animate-in">QCT Registration Number: 943461</p>
+                </div>
+            </div>
+        </footer>
+
+    </main>
+
+
+    <button id="back-to-top" aria-label="Back to top">↑</button>
+
+    <script>
+        gsap.registerPlugin(ScrollTrigger);
+
+        const animateIn = (element) => {
+            gsap.to(element, {
+                y: 0,
+                opacity: 1,
+                duration: 1,
+                ease: "power3.out",
+            });
+        };
+
+        gsap.utils.toArray(".animate-in").forEach((element) => {
+            ScrollTrigger.create({
+                trigger: element,
+                start: "top 80%",
+                onEnter: () => animateIn(element),
+            });
+        });
+
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // Parallax effect for background blobs
+        gsap.to(".animate-blob", {
+            y: "random(-100, 100)",
+            x: "random(-100, 100)",
+            duration: 10,
+            ease: "none",
+            repeat: -1,
+            repeatRefresh: true,
+        });
+
+        // Cursor trail effect
+        const trail = document.createElement('div');
+        trail.className = 'fixed w-6 h-6 rounded-full pointer-events-none mix-blend-difference';
+        document.body.appendChild(trail);
+
+        let mouseX = 0, mouseY = 0;
+        let trailX = 0, trailY = 0;
+
+        document.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+        });
+
+        gsap.ticker.add(() => {
+            const speed = 0.2;
+            
+            trailX += (mouseX - trailX) * speed;
+            trailY += (mouseY - trailY) * speed;
+            
+            gsap.set(trail, { x: trailX, y: trailY });
+        });
+
+        // Random color change for cursor trail
+        setInterval(() => {
+            const randomColor = `hsl(${Math.random() * 360}, 100%, 50%)`;
+            gsap.to(trail, { backgroundColor: randomColor, duration: 1 });
+        }, 2000);
+
+        // Add a subtle parallax effect to the sections
+        gsap.utils.toArray("section").forEach((section, i) => {
+            const bg = section.querySelector(".container");
+            gsap.to(bg, {
+                y: "30%",
+                ease: "none",
+                scrollTrigger: {
+                    trigger: section,
+                    scrub: true
+                }
+            });
+        });
+
+        // Animate the hero section elements
+        gsap.from("#hero h1", { opacity: 0, y: 50, duration: 1, delay: 0.5 });
+        gsap.from("#hero p", { opacity: 0, y: 50, duration: 1, delay: 0.7 });
+        gsap.from("#hero a", { opacity: 0, y: 50, duration: 1, delay: 0.9 });
+
+        // Add hover effect to buttons and links
+        const interactiveElements = document.querySelectorAll('button, a');
+        interactiveElements.forEach(element => {
+            element.addEventListener('mouseenter', () => {
+                gsap.to(element, { scale: 1.05, duration: 0.3 });
+            });
+            element.addEventListener('mouseleave', () => {
+                gsap.to(element, { scale: 1, duration: 0.3 });
+            });
+        });
+
+        // Add this new code at the end of your script
+        const footer = document.querySelector('.footer');
+        const bottomSection = document.querySelector('#bottom-section');
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    footer.classList.add('visible');
+                } else {
+                    footer.classList.remove('visible');
+                }
+            });
+        }, {
+            threshold: 0.1 // Adjust this value to control when the footer appears
+        });
+
+        observer.observe(bottomSection);
+
+        const backToTopButton = document.getElementById('back-to-top');
+
+        // Show/hide button based on scroll position
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 100) {
+                backToTopButton.style.opacity = '0.7'; // Show button
+            } else {
+                backToTopButton.style.opacity = '0'; // Hide button
+            }
+        });
+
+        // Scroll to top when button is clicked
+        backToTopButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+
+        // Function to handle smooth scrolling
+        function scrollToSection(sectionId) {
+            const section = document.getElementById(sectionId);
+            if (section) {
+                section.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        // Handle anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const sectionId = this.getAttribute('href').substring(1);
+                scrollToSection(sectionId);
+            });
+        });
+
+        // Ensure the first section is visible on page load
+        window.addEventListener('load', () => {
+            scrollToSection('hero');
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,266 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    font-family: 'Poppins', sans-serif;
+    color: #ffffff;
+    background-color: #1a0033;
+    overflow: hidden;
+}
+
+.snap-container {
+    height: 100vh;
+    overflow-y: scroll;
+    scroll-snap-type: y mandatory;
+    scroll-behavior: smooth;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* Internet Explorer 10+ */
+}
+
+.snap-container::-webkit-scrollbar {
+    width: 0; /* WebKit */
+    display: none;
+}
+
+.snap-section {
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 0;
+    box-sizing: border-box;
+}
+
+#gradient-background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+}
+
+#bubbles-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    pointer-events: none;
+}
+
+.bubble {
+    position: absolute;
+    border-radius: 50%;
+    opacity: 0;
+    pointer-events: none;
+    width: 50px;
+    height: 50px;
+}
+
+.card {
+    background-color: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border-radius: 15px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+    transition: all 0.5s ease;
+    overflow: hidden;
+    position: relative;
+    z-index: 2;
+    width: 80%;
+    max-width: 600px;
+    max-height: 60vh;
+    opacity: 0;
+    transform: translateY(50px);
+    overflow-y: auto;
+}
+
+.card.active {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.5);
+}
+
+.card-inner {
+    padding: 1.5rem;
+    position: relative;
+    z-index: 2;
+}
+
+.card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.7);
+    opacity: 1;
+    transition: all 0.3s ease;
+    z-index: 1;
+}
+
+.card-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+    transition: all 0.3s ease;
+    color: #ffffff;
+}
+
+.card-content {
+    opacity: 1;
+    max-height: 300px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    color: #ffffff;
+}
+
+.skills-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.skills-card {
+    margin-bottom: 1rem;
+    width: 80%;
+    max-width: 500px;
+}
+
+/* General styles for all icon frames */
+.icon-frame {
+    position: relative;
+    background-color: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border-radius: 15px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+    padding: 1rem;
+    transition: all 0.3s ease;
+    opacity: 0;
+    transform: translateY(50px);
+}
+
+.icon-frame svg {
+    overflow: visible;
+    transition: all 0.3s ease;
+    color: #ffffff;
+}
+
+.icon-frame:hover {
+    transform: scale(1.05) rotate(2deg);
+    box-shadow: 0 0 20px 5px rgba(255, 255, 255, 0.3);
+}
+
+.icon-frame:hover svg {
+    filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.5));
+}
+
+.icon-frame.active {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Specific styles for education icons */
+.education-icon-frame::after {
+    content: attr(data-number);
+    position: absolute;
+    top: 4px;
+    right: 8px;
+    font-size: 14px;
+    font-weight: bold;
+    color: #ffffff;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.education-icon-frame svg text {
+    font-weight: bold;
+    fill: #ffffff;
+    stroke: #000000;
+    stroke-width: 0.5px;
+    paint-order: stroke fill;
+    font-size: 8px;
+}
+
+/* Specific styles for OS icons */
+.os-icon-frame svg {
+    width: 48px;
+    height: 48px;
+}
+
+#os-icons-container,
+#education-icons-container,
+#experience-icons-container {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    margin-top: 1rem;
+}
+
+#scroll-indicator {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 5px;
+    height: 0;
+    background-color: #ffffff;
+    z-index: 1000;
+    transition: height 0.1s ease-out;
+}
+
+.scroll-indicator-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: fixed;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    transition: all 0.3s ease;
+}
+
+.scroll-text {
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.scroll-indicator-container.minimized {
+    transform: translateX(-50%) scale(0.5);
+    bottom: 1rem;
+}
+
+.scroll-indicator-container i {
+    transition: all 0.3s ease;
+}
+
+@media (max-width: 768px) {
+    .card {
+        width: 90%;
+    }
+}
+
+.icon-frame {
+    opacity: 0;
+    transform: translateY(50px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.icon-frame.active {
+    opacity: 1;
+    transform: translateY(0);
+}
